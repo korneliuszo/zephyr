@@ -580,7 +580,7 @@ void board_refresh_display(void)
 
 int board_init(void)
 {
-	epd_dev = DEVICE_DT_GET_ONE(solomon_ssd16xxfb);
+	epd_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
 	if (!device_is_ready(epd_dev)) {
 		printk("%s: device not ready.\n", epd_dev->name);
 		return -ENODEV;
