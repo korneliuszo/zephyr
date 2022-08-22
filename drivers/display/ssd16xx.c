@@ -104,6 +104,7 @@ struct ssd16xx_config {
 	uint16_t height;
 	uint16_t width;
 	uint8_t tssv;
+	struct ssd16xx_dt_array cntrl1_data;
 };
 
 static int ssd16xx_set_profile(const struct device *dev,
@@ -801,6 +802,15 @@ static int ssd16xx_set_profile(const struct device *dev,
 		}
 	}
 
+	if (config->cntrl1_data.len) {
+		err = ssd16xx_write_cmd(dev, SSD16XX_CMD_UPDATE_CTRL1,
+					 config->cntrl1_data.data,
+					 config->cntrl1_data.len);
+		if (err < 0) {
+			return err;
+		}
+	}
+
 	err = ssd16xx_load_lut(dev, p ? &p->lut : NULL);
 	if (err < 0) {
 		return err;
@@ -1087,6 +1097,7 @@ static struct ssd16xx_quirks quirks_solomon_ssd1681 = {
 
 #define SSD16XX_DEFINE(n, quirks_ptr)					\
 	SSD16XX_MAKE_ARRAY_OPT(n, softstart);				\
+	SSD16XX_MAKE_ARRAY_OPT(n, cntrl1_data);				\
 									\
 	DT_FOREACH_CHILD(n, SSD16XX_PROFILE);				\
 									\
@@ -1104,6 +1115,7 @@ static struct ssd16xx_quirks quirks_solomon_ssd1681 = {
 		.orientation = DT_PROP(n, orientation_flipped),		\
 		.tssv = DT_PROP_OR(n, tssv, 0),				\
 		.softstart = SSD16XX_ASSIGN_ARRAY(n, softstart),	\
+		.cntrl1_data = SSD16XX_ASSIGN_ARRAY(n, cntrl1_data),	\
 		.profiles = {						\
 			[SSD16XX_PROFILE_FULL] =			\
 				SSD16XX_PROFILE_PTR(DT_CHILD(n, full)),	\
