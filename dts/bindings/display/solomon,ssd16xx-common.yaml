@@ -16,6 +16,11 @@ properties:
       required: false
       description: setup cntrl1 register for setting source range
 
+    otp-selection-ctl:
+      type: uint8-array
+      required: false
+      description: setup SSD16XX_CMD_OTP_SELECTION_CTRL register for setting ping pong update
+
     orientation-flipped:
       type: boolean
       required: false

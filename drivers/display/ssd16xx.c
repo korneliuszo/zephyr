@@ -105,6 +105,7 @@ struct ssd16xx_config {
 	uint16_t width;
 	uint8_t tssv;
 	struct ssd16xx_dt_array cntrl1_data;
+	struct ssd16xx_dt_array otp_selection_ctl;
 };
 
 static int ssd16xx_set_profile(const struct device *dev,
@@ -811,6 +812,15 @@ static int ssd16xx_set_profile(const struct device *dev,
 		}
 	}
 
+	if (config->otp_selection_ctl.len) {
+		err = ssd16xx_write_cmd(dev, SSD16XX_CMD_OTP_SELECTION_CTRL,
+					 config->otp_selection_ctl.data,
+					 config->otp_selection_ctl.len);
+		if (err < 0) {
+			return err;
+		}
+	}
+
 	err = ssd16xx_load_lut(dev, p ? &p->lut : NULL);
 	if (err < 0) {
 		return err;
@@ -1098,6 +1108,7 @@ static struct ssd16xx_quirks quirks_solomon_ssd1681 = {
 #define SSD16XX_DEFINE(n, quirks_ptr)					\
 	SSD16XX_MAKE_ARRAY_OPT(n, softstart);				\
 	SSD16XX_MAKE_ARRAY_OPT(n, cntrl1_data);				\
+	SSD16XX_MAKE_ARRAY_OPT(n, otp_selection_ctl);			\
 									\
 	DT_FOREACH_CHILD(n, SSD16XX_PROFILE);				\
 									\
@@ -1116,6 +1127,7 @@ static struct ssd16xx_quirks quirks_solomon_ssd1681 = {
 		.tssv = DT_PROP_OR(n, tssv, 0),				\
 		.softstart = SSD16XX_ASSIGN_ARRAY(n, softstart),	\
 		.cntrl1_data = SSD16XX_ASSIGN_ARRAY(n, cntrl1_data),	\
+		.otp_selection_ctl = SSD16XX_ASSIGN_ARRAY(n, otp_selection_ctl),	\
 		.profiles = {						\
 			[SSD16XX_PROFILE_FULL] =			\
 				SSD16XX_PROFILE_PTR(DT_CHILD(n, full)),	\
